@@ -37,6 +37,12 @@ local.properties
 *.b#?
 *.s#?
 
+# Autorouter statistics
+*.pro
+
+# Lock files
+*.lck
+
 
 #################
 ## Visual Studio
