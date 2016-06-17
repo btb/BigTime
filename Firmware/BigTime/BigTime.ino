@@ -62,7 +62,6 @@
  allow the 5MM LED to fit inside the circumference of the enclosure.
  
  */
-#include "main.h"
 
 #include <avr/sleep.h> //Needed for sleep_mode
 #include <avr/power.h> //Needed for powering down perihperals such as the ADC/TWI and Timers
@@ -90,26 +89,24 @@ int hours = 8;
 #define GREEN 2
 #define BLUE  3
 #define YELLOW  4
-int systemColor = BLUE;
+int systemColor = RED;
 int display_brightness = 15000; //A larger number makes the display more dim. This is set correctly below.
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //Pin definitions
 int digit1 = 9; //Display pin 1
-int digit2 = 10; //Display pin 2
-int digit3 = A0; //Display pin 6
-int digit4 = A1; //Display pin 8
+int digit2 = 10; //Display pin 10
+int digit3 = A0; //Display pin 4
+int digit4 = A1; //Display pin 6
 
-int segA = 6; //Display pin 14
-int segB = 8; //Display pin 16
-int segC = 5; //Display pin 13
-int segD = 11; //Display pin 3
-int segE = 13; //Display pin 5
-int segF = 4; //Display pin 11
-int segG = 7; //Display pin 15
-
-int colons = 12; //Display pin 4
-int ampm = 3; //Display pin 10
+int segA = 6; //Display pin 12
+int segB = 8; //Display pin 11
+int segC = 5; //Display pin 3
+int segD = 11; //Display pin 8
+int segE = 13; //Display pin 2
+int segF = 4; //Display pin 9
+int segG = 7; //Display pin 7
+int segDP = 12; //Display pin 5
 
 int theButton = 2;
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -161,13 +158,12 @@ void setup() {
   pinMode(segE, OUTPUT);
   pinMode(segF, OUTPUT);
   pinMode(segG, OUTPUT);
+  pinMode(segDP, OUTPUT);
 
   pinMode(digit1, OUTPUT);
   pinMode(digit2, OUTPUT);
   pinMode(digit3, OUTPUT);
   pinMode(digit4, OUTPUT);
-  pinMode(colons, OUTPUT);
-  pinMode(ampm, OUTPUT);
 
   //Power down various bits of hardware to lower power usage  
   set_sleep_mode(SLEEP_MODE_PWR_SAVE);
@@ -415,8 +411,8 @@ void setTime(void) {
 //After running through the 4 numbers, the display is turned off
 void displayNumber(int toDisplay, boolean displayColon) {
 
-#define DIGIT_ON  HIGH
-#define DIGIT_OFF  LOW
+#define DIGIT_ON  LOW
+#define DIGIT_OFF HIGH
 
   for(int digit = 4 ; digit > 0 ; digit--) {
 
@@ -427,7 +423,7 @@ void displayNumber(int toDisplay, boolean displayColon) {
       break;
     case 2:
       digitalWrite(digit2, DIGIT_ON);
-      if(displayColon == true) digitalWrite(colons, DIGIT_ON); //When we update digit 2, let's turn on colons as well
+//      if(displayColon == true) digitalWrite(colons, DIGIT_ON); //When we update digit 2, let's turn on colons as well
       break;
     case 3:
       digitalWrite(digit3, DIGIT_ON);
@@ -458,8 +454,8 @@ void displayNumber(int toDisplay, boolean displayColon) {
     digitalWrite(digit2, DIGIT_OFF);
     digitalWrite(digit3, DIGIT_OFF);
     digitalWrite(digit4, DIGIT_OFF);
-    digitalWrite(colons, DIGIT_OFF);
-    digitalWrite(ampm, DIGIT_OFF);
+//    digitalWrite(colons, DIGIT_OFF);
+//    digitalWrite(ampm, DIGIT_OFF);
   }
 
 }
@@ -471,8 +467,8 @@ void displayLetters(char *colorName) {
 #define DIGIT_OFF  LOW
 
   digitalWrite(digit4, DIGIT_OFF);
-  digitalWrite(colons, DIGIT_OFF);
-  digitalWrite(ampm, DIGIT_OFF);
+//  digitalWrite(colons, DIGIT_OFF);
+//  digitalWrite(ampm, DIGIT_OFF);
 
   for(int digit = 0 ; digit < 4 ; digit++) {
     //Turn on a digit for a short amount of time
@@ -511,8 +507,8 @@ void displayLetters(char *colorName) {
 //If number == 10, then turn off all segments
 void lightNumber(int numberToDisplay) {
 
-#define SEGMENT_ON  LOW
-#define SEGMENT_OFF HIGH
+#define SEGMENT_ON  HIGH
+#define SEGMENT_OFF LOW
 
   /*
 Segments
