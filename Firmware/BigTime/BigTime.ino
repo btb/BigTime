@@ -67,9 +67,6 @@
 #include <avr/sleep.h> //Needed for sleep_mode
 #include <avr/power.h> //Needed for powering down perihperals such as the ADC/TWI and Timers
 
-//Declaring this will enable IR broadcast when you hit the time button twice
-//By default, we don't enable this
-//#define ENABLE_TVBGONE 
 
 //Set the 12hourMode to false for military/world time. Set it to true for American 12 hour time.
 int TwelveHourMode = true;
@@ -300,27 +297,6 @@ void showTime() {
       buttonPreviouslyHit = true;
     }
     else if( (buttonPreviouslyHit == true) && (digitalRead(theButton) == HIGH) ) {
-
-#ifdef ENABLE_TVBGONE
-      //Disable TIMER2 for IR control
-      TCCR2A = 0x00;
-      TCCR2B = 0;
-      ASSR = 0;
-      TIMSK2 = 0; //Enable the timer 2 interrupt
-
-      //Turn off all the things!
-      sendAllCodes();
-
-      //Setup TIMER2
-      TCCR2A = 0x00;
-      //TCCR2B = (1<<CS22)|(1<<CS20); //Set CLK/128 or overflow interrupt every 1s
-      TCCR2B = (1<<CS22)|(1<<CS21)|(1<<CS20); //Set CLK/1024 or overflow interrupt every 8s
-      ASSR = (1<<AS2); //Enable asynchronous operation
-      TIMSK2 = (1<<TOIE2); //Enable the timer 2 interrupt
-
-      quickflashLEDx(2); //Blink Colons twice letting us know it's done
-#endif
-
       return;
     }      
   }
