@@ -463,8 +463,8 @@ void displayNumber(int toDisplay, boolean displayColon) {
 //Takes a string like "gren" and displays it, left justified
 //We don't use the colons, or AMPM dot, so they are turned off
 void displayLetters(char *colorName) {
-#define DIGIT_ON  HIGH
-#define DIGIT_OFF  LOW
+#define DIGIT_ON  LOW
+#define DIGIT_OFF HIGH
 
   digitalWrite(digit4, DIGIT_OFF);
 //  digitalWrite(colons, DIGIT_OFF);
