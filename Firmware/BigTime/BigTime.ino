@@ -215,26 +215,6 @@ void loop() {
 }
 
 void showTime() {
-
-  //Here is where we display the time and PWM the segments
-  //Display brightness changes based on color, red is too bright, blue is very dull
-  //By painting the time, then turning off for a number of microseconds, we can control how bright the display is
-
-  //Each digit is on for a certain amount of microseconds
-  //Then it is turned off and we go to the next digit
-  //We loop through each digit until we reach the show_time_length (usually about 2 seconds)
-
-  //For the default red display:
-  //Let's define a variable called display_brightness that varies from:
-  //5000 blindingly bright (15.7mA current draw per digit)
-  //2000 shockingly bright (11.4mA current draw per digit)
-  //1000 pretty bright (5.9mA)
-  //500 normal (3mA)
-  //200 dim but readable (1.4mA)
-  //50 dim but readable (0.56mA)
-  //5 dim but readable (0.31mA)
-  //1 dim but readable in dark (0.28mA)
-
   TimeElements tm;
   breakTime(t, tm);
 
@@ -257,10 +237,6 @@ void showTime() {
   long startTime = millis();
   while( (millis() - startTime) < show_time_length) {
     displayNumber(combinedTime, true); //Each call takes about 8ms, display the colon
-
-    //After the time is displayed, the segments are turned off
-    //We control the brightness by modifying how long we wait between re-paints of the display
-    //delayMicroseconds(display_brightness);
 
     //If you have hit and released the button while the display is on, start the IR off sequence
     if(digitalRead(theButton) == LOW) {
