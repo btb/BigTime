@@ -180,6 +180,9 @@ void setup() {
   tm.Second = 55;
   tm.Minute = 12;
   tm.Hour = 8;
+  tm.Day = 31;
+  tm.Month = 12;
+  tm.Year = 2015-1970;
 
   t = makeTime(tm);
 
@@ -199,11 +202,19 @@ void loop() {
     delay(100);
     while(digitalRead(theButton) == LOW) ; //Wait for you to remove your finger
 
-    /*Serial.print(hours, DEC);
-     Serial.print(":");
-     Serial.print(minutes, DEC);
-     Serial.print(":");
-     Serial.println(seconds, DEC);*/
+    Serial.print(year(t), DEC);
+    Serial.print("-");
+    Serial.print(month(t), DEC);
+    Serial.print("-");
+    Serial.print(day(t), DEC);
+    Serial.print(" ");
+    Serial.print(hour(t), DEC);
+    Serial.print(":");
+    Serial.print(minute(t), DEC);
+    Serial.print(":");
+    Serial.print(second(t), DEC);
+    if (isAM(t)) Serial.println(" AM");
+    if (isPM(t)) Serial.println(" PM");
 
     showTime(); //Show the current time for a few seconds
 
@@ -238,9 +249,12 @@ void showTime() {
   while( (millis() - startTime) < show_time_length) {
     displayNumber(combinedTime, true); //Each call takes about 8ms, display the colon
 
-    //If you have hit and released the button while the display is on, start the IR off sequence
+    //If you have hit and released the button while the display is on, show the date
     if(digitalRead(theButton) == LOW) {
-      buttonPreviouslyHit = true;
+      while(digitalRead(theButton) == LOW) ; //Wait for you to remove your finger
+
+      combinedTime = (tm.Month * 100) + tm.Day;
+      startTime = millis();
     }
     else if( (buttonPreviouslyHit == true) && (digitalRead(theButton) == HIGH) ) {
       return;
@@ -255,7 +269,7 @@ void showTime() {
 //Releasing the button for more than 2 seconds will exit this mode
 void setTime(void) {
   TimeElements tm;
-  breakTime(t, tm)
+  breakTime(t, tm);
 
   int idleMiliseconds = 0;
   //This is the timeout counter. Once we get to ~2 seconds of inactivity, the watch
