@@ -65,6 +65,7 @@
 
 #include <avr/sleep.h> //Needed for sleep_mode
 #include <avr/power.h> //Needed for powering down perihperals such as the ADC/TWI and Timers
+#include <Time.h>
 
 
 //Set the 12hourMode to false for military/world time. Set it to true for American 12 hour time.
@@ -78,9 +79,7 @@ int show_the_time = false;
 //This will drain the battery in about 15 hours 
 int always_on = false;
 
-long seconds = 55;
-int minutes = 12;
-int hours = 8;
+time_t t;
 
 int display_brightness = 15000; //A larger number makes the display more dim. This is set correctly below.
 
@@ -105,24 +104,8 @@ int theButton = 2;
 
 //The very important 32.686kHz interrupt handler
 SIGNAL(TIMER2_OVF_vect){
-  seconds += 8; //We sleep for 8 seconds instead of 1 to save more power
-  //seconds++; //Use this if we are waking up every second
-
-  //Update the minutes and hours variables
-  minutes += seconds / 60; //Example: seconds = 2317, minutes = 58 + 38 = 96
-  seconds %= 60; //seconds = 37
-  hours += minutes / 60; //12 + (96 / 60) = 13
-  minutes %= 60; //minutes = 36
-
-  //Do we display 12 hour or 24 hour time?
-  if(TwelveHourMode == true) {
-    //In 12 hour mode, hours go from 12 to 1 to 12.
-    while(hours > 12) hours -= 12;
-  }
-  else {
-    //In 24 hour mode, hours go from 0 to 23 to 0.
-    while(hours > 23) hours -= 24;
-  }
+  t += 8; //We sleep for 8 seconds instead of 1 to save more power
+  //t++; //Use this if we are waking up every second
 }
 
 //The interrupt occurs when you push the button
@@ -193,6 +176,13 @@ void setup() {
   Serial.begin(9600);  
   Serial.println("BigTime Testing:");
 
+  TimeElements tm;
+  tm.Second = 55;
+  tm.Minute = 12;
+  tm.Hour = 8;
+
+  t = makeTime(tm);
+
   showTime(); //Show the current time for a few seconds
 
   sei(); //Enable global interrupts
@@ -245,8 +235,21 @@ void showTime() {
   //5 dim but readable (0.31mA)
   //1 dim but readable in dark (0.28mA)
 
-  int combinedTime = (hours * 100) + minutes; //Combine the hours and minutes
-  //int combinedTime = (minutes * 100) + seconds; //For testing, combine the minutes and seconds
+  TimeElements tm;
+  breakTime(t, tm);
+
+  //Do we display 12 hour or 24 hour time?
+  if(TwelveHourMode == true) {
+    //In 12 hour mode, hours go from 12 to 1 to 12.
+    while(tm.Hour > 12) tm.Hour -= 12;
+  }
+  else {
+    //In 24 hour mode, hours go from 0 to 23 to 0.
+    while(tm.Hour > 23) tm.Hour -= 24;
+  }
+
+  int combinedTime = (tm.Hour * 100) + tm.Minute; //Combine the hours and minutes
+  //int combinedTime = (tm.Minute * 100) + tm.Second; //For testing, combine the minutes and seconds
 
   boolean buttonPreviouslyHit = false;
 
@@ -275,6 +278,8 @@ void showTime() {
 //Holding the button down will increase the time (accelerates)
 //Releasing the button for more than 2 seconds will exit this mode
 void setTime(void) {
+  TimeElements tm;
+  breakTime(t, tm)
 
   int idleMiliseconds = 0;
   //This is the timeout counter. Once we get to ~2 seconds of inactivity, the watch
@@ -289,24 +294,24 @@ void setTime(void) {
     cli(); //We don't want the interrupt changing values at the same time we are!
 
     //Update the minutes and hours variables
-    minutes += seconds / 60; //Example: seconds = 2317, minutes = 58 + 38 = 96
-    seconds %= 60; //seconds = 37
-    hours += minutes / 60; //12 + (96 / 60) = 13
-    minutes %= 60; //minutes = 36
+    tm.Minute += tm.Second / 60; //Example: seconds = 2317, minutes = 58 + 38 = 96
+    tm.Second %= 60; //seconds = 37
+    tm.Hour += tm.Minute / 60; //12 + (96 / 60) = 13
+    tm.Minute %= 60; //minutes = 36
 
     //Do we display 12 hour or 24 hour time?
     if(TwelveHourMode == true) {
       //In 12 hour mode, hours go from 12 to 1 to 12.
-      while(hours > 12) hours -= 12;
+      while(tm.Hour > 12) tm.Hour -= 12;
     }
     else {
       //In 24 hour mode, hours go from 0 to 23 to 0.
-      while(hours > 23) hours -= 24;
+      while(tm.Hour > 23) tm.Hour -= 24;
     }
 
     sei(); //Resume interrupts
 
-    int combinedTime = (hours * 100) + minutes; //Combine the hours and minutes
+    int combinedTime = (tm.Hour * 100) + tm.Minute; //Combine the hours and minutes
 
       for(int x = 0 ; x < 10 ; x++) {
       displayNumber(combinedTime, true); //Each call takes about 8ms, display the colon for about 100ms
@@ -323,13 +328,13 @@ void setTime(void) {
 
       buttonHold++;
       if(buttonHold < 10) //10 = 2 seconds
-        minutes++; //Advance the minutes
+        tm.Minute++; //Advance the minutes
       else {
         //Advance the minutes faster because you're holding the button for 10 seconds
         //Start advancing on the tens digit. Floor the single minute digit.
-        minutes /= 10; //minutes = 46 / 10 = 4
-        minutes *= 10; //minutes = 4 * 10 = 40
-        minutes += 10;  //minutes = 40 + 10 = 50
+        tm.Minute /= 10; //minutes = 46 / 10 = 4
+        tm.Minute *= 10; //minutes = 4 * 10 = 40
+        tm.Minute += 10;  //minutes = 40 + 10 = 50
       }
     }
     else
@@ -337,6 +342,7 @@ void setTime(void) {
 
     idleMiliseconds += 200;
   }
+  t = makeTime(tm);
 }
 
 //This is a not-so-accurate delay routine
