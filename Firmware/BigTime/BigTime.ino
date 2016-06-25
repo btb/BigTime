@@ -213,8 +213,6 @@ void loop() {
     Serial.print(minute(t), DEC);
     Serial.print(":");
     Serial.print(second(t), DEC);
-    if (isAM(t)) Serial.println(" AM");
-    if (isPM(t)) Serial.println(" PM");
 
     showTime(); //Show the current time for a few seconds
 
