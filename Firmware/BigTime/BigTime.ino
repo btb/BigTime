@@ -193,7 +193,7 @@ void setup() {
   Serial.begin(9600);  
   Serial.println("BigTime Testing:");
 
-  //  showTime(); //Show the current time for a few seconds
+  showTime(); //Show the current time for a few seconds
 
   sei(); //Enable global interrupts
 }
