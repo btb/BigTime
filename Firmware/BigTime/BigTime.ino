@@ -82,14 +82,6 @@ long seconds = 55;
 int minutes = 12;
 int hours = 8;
 
-//Careful messing with the system color, you can damage the display if
-//you assign the wrong color. If you're in doubt, set it to red and load the code,
-//then see what the color is.
-#define RED  1
-#define GREEN 2
-#define BLUE  3
-#define YELLOW  4
-int systemColor = RED;
 int display_brightness = 15000; //A larger number makes the display more dim. This is set correctly below.
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -201,27 +193,6 @@ void setup() {
   Serial.begin(9600);  
   Serial.println("BigTime Testing:");
 
-  //Now display the system color - this is mostly for production to verify
-  //that the correct code is loaded onto the ATmega
-  //Display brightness changes based on color
-  if(systemColor == RED) {
-    display_brightness = 1500; //The higher the number, the lower the brightness
-    showColor("red ");
-  }
-  else if(systemColor == GREEN) {
-    display_brightness = 1;
-    showColor("gren");
-  }
-  else if(systemColor == BLUE) {
-    display_brightness = 1; //Works well for blue displays, uses about 5.5mA
-    showColor("bLue");
-  }
-  else if(systemColor == YELLOW) {
-    //display_brightness = 1500;
-    display_brightness = 1;
-    showColor("yeLo");
-  }
-
   //  showTime(); //Show the current time for a few seconds
 
   sei(); //Enable global interrupts
@@ -297,21 +268,6 @@ void showTime() {
     }      
   }
 
-}
-
-//Displays a string on the display
-//Used to indicate which code is loaded onto the watch
-void showColor(char *colorName) {
-
-  //Now show the letters for a certain length of time
-  long startTime = millis();
-  while( (millis() - startTime) < show_time_length) {
-    displayLetters(colorName); //Each call takes about 8ms, display the colon
-
-    //After the letters are displayed, the segments are turned off
-    //We control the brightness by modifying how long we wait between re-paints of the display
-    delayMicroseconds(display_brightness);
-  }
 }
 
 //This routine occurs when you hold the button down
