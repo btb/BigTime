@@ -66,6 +66,7 @@
 #include <avr/sleep.h> //Needed for sleep_mode
 #include <avr/power.h> //Needed for powering down perihperals such as the ADC/TWI and Timers
 #include <Time.h>
+#include <SevSeg.h>
 
 
 //Set the 12hourMode to false for military/world time. Set it to true for American 12 hour time.
@@ -81,24 +82,10 @@ int always_on = false;
 
 time_t t;
 
-int display_brightness = 15000; //A larger number makes the display more dim. This is set correctly below.
+SevSeg myDisplay;
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //Pin definitions
-int digit1 = 9; //Display pin 1
-int digit2 = 10; //Display pin 10
-int digit3 = A0; //Display pin 4
-int digit4 = A1; //Display pin 6
-
-int segA = 6; //Display pin 12
-int segB = 8; //Display pin 11
-int segC = 5; //Display pin 3
-int segD = 11; //Display pin 8
-int segE = 13; //Display pin 2
-int segF = 4; //Display pin 9
-int segG = 7; //Display pin 7
-int segDP = 12; //Display pin 5
-
 int theButton = 2;
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -125,20 +112,27 @@ void setup() {
   pinMode(theButton, INPUT); //This is the main button, tied to INT0
   digitalWrite(theButton, HIGH); //Enable internal pull up on button
 
-  //These pins are used to control the display
-  pinMode(segA, OUTPUT);
-  pinMode(segB, OUTPUT);
-  pinMode(segC, OUTPUT);
-  pinMode(segD, OUTPUT);
-  pinMode(segE, OUTPUT);
-  pinMode(segF, OUTPUT);
-  pinMode(segG, OUTPUT);
-  pinMode(segDP, OUTPUT);
+  int displayType = COMMON_CATHODE; //Your display is either common cathode or common anode
 
-  pinMode(digit1, OUTPUT);
-  pinMode(digit2, OUTPUT);
-  pinMode(digit3, OUTPUT);
-  pinMode(digit4, OUTPUT);
+  int digit1 = 9; //Display pin 1
+  int digit2 = 10; //Display pin 10
+  int digit3 = A0; //Display pin 4
+  int digit4 = A1; //Display pin 6
+
+  int segA = 6; //Display pin 12
+  int segB = 8; //Display pin 11
+  int segC = 5; //Display pin 3
+  int segD = 11; //Display pin 8
+  int segE = 13; //Display pin 2
+  int segF = 4; //Display pin 9
+  int segG = 7; //Display pin 7
+  int segDP = 12; //Display pin 5
+   
+  int numberOfDigits = 4; //Do you have a 1, 2 or 4 digit display?
+
+  myDisplay.Begin(displayType, numberOfDigits, digit1, digit2, digit3, digit4, segA, segB, segC, segD, segE, segF, segG, segDP);
+  
+  myDisplay.SetBrightness(100); //Set the display to 100% brightness level
 
   //Power down various bits of hardware to lower power usage  
   set_sleep_mode(SLEEP_MODE_PWR_SAVE);
@@ -212,7 +206,7 @@ void loop() {
     Serial.print(":");
     Serial.print(minute(t), DEC);
     Serial.print(":");
-    Serial.print(second(t), DEC);
+    Serial.println(second(t), DEC);
 
     showTime(); //Show the current time for a few seconds
 
@@ -227,6 +221,8 @@ void showTime() {
   TimeElements tm;
   breakTime(t, tm);
 
+  char tempString[10];
+  
   //Do we display 12 hour or 24 hour time?
   if(TwelveHourMode == true) {
     //In 12 hour mode, hours go from 12 to 1 to 12.
@@ -237,21 +233,21 @@ void showTime() {
     while(tm.Hour > 23) tm.Hour -= 24;
   }
 
-  int combinedTime = (tm.Hour * 100) + tm.Minute; //Combine the hours and minutes
-  //int combinedTime = (tm.Minute * 100) + tm.Second; //For testing, combine the minutes and seconds
+  sprintf(tempString, "%2d%2d", tm.Hour, tm.Minute); //Combine the hours and minutes
+  //sprintf(tempString, "%2d%2d", tm.Minute, tm.Second); //For testing, combine the minutes and seconds
 
   boolean buttonPreviouslyHit = false;
 
   //Now show the time for a certain length of time
   long startTime = millis();
   while( (millis() - startTime) < show_time_length) {
-    displayNumber(combinedTime, true); //Each call takes about 8ms, display the colon
+    myDisplay.DisplayString(tempString, 15);
 
     //If you have hit and released the button while the display is on, show the date
     if(digitalRead(theButton) == LOW) {
       while(digitalRead(theButton) == LOW) ; //Wait for you to remove your finger
 
-      combinedTime = (tm.Month * 100) + tm.Day;
+      sprintf(tempString, "%2d%2d", tm.Month, tm.Day);
       startTime = millis();
     }
     else if( (buttonPreviouslyHit == true) && (digitalRead(theButton) == HIGH) ) {
@@ -268,6 +264,8 @@ void showTime() {
 void setTime(void) {
   TimeElements tm;
   breakTime(t, tm);
+
+  char tempString[10];
 
   int idleMiliseconds = 0;
   //This is the timeout counter. Once we get to ~2 seconds of inactivity, the watch
@@ -299,16 +297,9 @@ void setTime(void) {
 
     sei(); //Resume interrupts
 
-    int combinedTime = (tm.Hour * 100) + tm.Minute; //Combine the hours and minutes
+    sprintf(tempString, "%2d%2d", tm.Hour, tm.Minute); //Combine the hours and minutes
 
-      for(int x = 0 ; x < 10 ; x++) {
-      displayNumber(combinedTime, true); //Each call takes about 8ms, display the colon for about 100ms
-      delayMicroseconds(display_brightness); //Wait before we paint the display again
-    }
-    for(int x = 0 ; x < 10 ; x++) {
-      displayNumber(combinedTime, false); //Each call takes about 8ms, turn off the colon for about 100ms
-      delayMicroseconds(display_brightness); //Wait before we paint the display again
-    }
+    myDisplay.DisplayString(tempString, 15);
 
     //If you're still hitting the button, then increase the time and reset the idleMili timeout variable
     if(digitalRead(theButton) == LOW) {
@@ -355,305 +346,4 @@ void setTime(void) {
  __asm__("nop\n\t"); 
  }
  }*/
-
-//Given 1022, we display "10:22"
-//Each digit is displayed for ~2000us, and cycles through the 4 digits
-//After running through the 4 numbers, the display is turned off
-void displayNumber(int toDisplay, boolean displayColon) {
-
-#define DIGIT_ON  LOW
-#define DIGIT_OFF HIGH
-
-  for(int digit = 4 ; digit > 0 ; digit--) {
-
-    //Turn on a digit for a short amount of time
-    switch(digit) {
-    case 1:
-      digitalWrite(digit1, DIGIT_ON);
-      break;
-    case 2:
-      digitalWrite(digit2, DIGIT_ON);
-//      if(displayColon == true) digitalWrite(colons, DIGIT_ON); //When we update digit 2, let's turn on colons as well
-      break;
-    case 3:
-      digitalWrite(digit3, DIGIT_ON);
-      break;
-    case 4:
-      digitalWrite(digit4, DIGIT_ON);
-      break;
-    }
-
-    //Now display this digit
-    if(digit > 1)
-      lightNumber(toDisplay % 10); //Turn on the right segments for this digit
-    else if(digit == 1) { //Special case on first digit, don't display 02:11, display 2:11
-      if( (toDisplay % 10) != 0) //If we are on the first digit, and it's not zero
-        lightNumber(toDisplay % 10); //Turn on the right segments for this digit
-    }
-
-    toDisplay /= 10;
-
-    delayMicroseconds(2000); //Display this digit for a fraction of a second (between 1us and 5000us, 500-2000 is pretty good)
-    //If you set this too long, the display will start to flicker. Set it to 25000 for some fun.
-
-    //Turn off all segments
-    lightNumber(10);
-
-    //Turn off all digits
-    digitalWrite(digit1, DIGIT_OFF);
-    digitalWrite(digit2, DIGIT_OFF);
-    digitalWrite(digit3, DIGIT_OFF);
-    digitalWrite(digit4, DIGIT_OFF);
-//    digitalWrite(colons, DIGIT_OFF);
-//    digitalWrite(ampm, DIGIT_OFF);
-  }
-
-}
-
-//Takes a string like "gren" and displays it, left justified
-//We don't use the colons, or AMPM dot, so they are turned off
-void displayLetters(char *colorName) {
-#define DIGIT_ON  LOW
-#define DIGIT_OFF HIGH
-
-  digitalWrite(digit4, DIGIT_OFF);
-//  digitalWrite(colons, DIGIT_OFF);
-//  digitalWrite(ampm, DIGIT_OFF);
-
-  for(int digit = 0 ; digit < 4 ; digit++) {
-    //Turn on a digit for a short amount of time
-    switch(digit) {
-    case 0:
-      digitalWrite(digit1, DIGIT_ON);
-      break;
-    case 1:
-      digitalWrite(digit2, DIGIT_ON);
-      break;
-    case 2:
-      digitalWrite(digit3, DIGIT_ON);
-      break;
-    case 3:
-      digitalWrite(digit4, DIGIT_ON);
-      break;
-    }
-
-    //Now display this letter
-    lightNumber(colorName[digit]); //Turn on the right segments for this letter
-
-    delayMicroseconds(2000); //Display this digit for a fraction of a second (between 1us and 5000us, 500-2000 is pretty good)
-    //If you set this too long, the display will start to flicker. Set it to 25000 for some fun.
-
-    //Turn off all segments
-    lightNumber(10);
-
-    //Turn off all digits
-    digitalWrite(digit1, DIGIT_OFF);
-    digitalWrite(digit2, DIGIT_OFF);
-    digitalWrite(digit3, DIGIT_OFF);
-  }
-}
-
-//Given a number, turns on those segments
-//If number == 10, then turn off all segments
-void lightNumber(int numberToDisplay) {
-
-#define SEGMENT_ON  HIGH
-#define SEGMENT_OFF LOW
-
-  /*
-Segments
-   -  A
-   F / / B
-   -  G
-   E / / C
-   -  D
-   */
-
-  switch (numberToDisplay){
-
-  case 0:
-    digitalWrite(segA, SEGMENT_ON);
-    digitalWrite(segB, SEGMENT_ON);
-    digitalWrite(segC, SEGMENT_ON);
-    digitalWrite(segD, SEGMENT_ON);
-    digitalWrite(segE, SEGMENT_ON);
-    digitalWrite(segF, SEGMENT_ON);
-    break;
-
-  case 1:
-    digitalWrite(segB, SEGMENT_ON);
-    digitalWrite(segC, SEGMENT_ON);
-    break;
-
-  case 2:
-    digitalWrite(segA, SEGMENT_ON);
-    digitalWrite(segB, SEGMENT_ON);
-    digitalWrite(segD, SEGMENT_ON);
-    digitalWrite(segE, SEGMENT_ON);
-    digitalWrite(segG, SEGMENT_ON);
-    break;
-
-  case 3:
-    digitalWrite(segA, SEGMENT_ON);
-    digitalWrite(segB, SEGMENT_ON);
-    digitalWrite(segC, SEGMENT_ON);
-    digitalWrite(segD, SEGMENT_ON);
-    digitalWrite(segG, SEGMENT_ON);
-    break;
-
-  case 4:
-    digitalWrite(segB, SEGMENT_ON);
-    digitalWrite(segC, SEGMENT_ON);
-    digitalWrite(segF, SEGMENT_ON);
-    digitalWrite(segG, SEGMENT_ON);
-    break;
-
-  case 5:
-    digitalWrite(segA, SEGMENT_ON);
-    digitalWrite(segC, SEGMENT_ON);
-    digitalWrite(segD, SEGMENT_ON);
-    digitalWrite(segF, SEGMENT_ON);
-    digitalWrite(segG, SEGMENT_ON);
-    break;
-
-  case 6:
-    digitalWrite(segA, SEGMENT_ON);
-    digitalWrite(segC, SEGMENT_ON);
-    digitalWrite(segD, SEGMENT_ON);
-    digitalWrite(segE, SEGMENT_ON);
-    digitalWrite(segF, SEGMENT_ON);
-    digitalWrite(segG, SEGMENT_ON);
-    break;
-
-  case 7:
-    digitalWrite(segA, SEGMENT_ON);
-    digitalWrite(segB, SEGMENT_ON);
-    digitalWrite(segC, SEGMENT_ON);
-    break;
-
-  case 8:
-    digitalWrite(segA, SEGMENT_ON);
-    digitalWrite(segB, SEGMENT_ON);
-    digitalWrite(segC, SEGMENT_ON);
-    digitalWrite(segD, SEGMENT_ON);
-    digitalWrite(segE, SEGMENT_ON);
-    digitalWrite(segF, SEGMENT_ON);
-    digitalWrite(segG, SEGMENT_ON);
-    break;
-
-  case 9:
-    digitalWrite(segA, SEGMENT_ON);
-    digitalWrite(segB, SEGMENT_ON);
-    digitalWrite(segC, SEGMENT_ON);
-    digitalWrite(segD, SEGMENT_ON);
-    digitalWrite(segF, SEGMENT_ON);
-    digitalWrite(segG, SEGMENT_ON);
-    break;
-
-  case 10:
-    digitalWrite(segA, SEGMENT_OFF);
-    digitalWrite(segB, SEGMENT_OFF);
-    digitalWrite(segC, SEGMENT_OFF);
-    digitalWrite(segD, SEGMENT_OFF);
-    digitalWrite(segE, SEGMENT_OFF);
-    digitalWrite(segF, SEGMENT_OFF);
-    digitalWrite(segG, SEGMENT_OFF);
-    break;
-
-    /*
-Segments
-     -  A
-     F / / B
-     -    G
-     E / / C
-     - D
-     */
-
-    //Letters
-  case 'b': //cdefg
-    digitalWrite(segC, SEGMENT_ON);
-    digitalWrite(segD, SEGMENT_ON);
-    digitalWrite(segE, SEGMENT_ON);
-    digitalWrite(segF, SEGMENT_ON);
-    digitalWrite(segG, SEGMENT_ON);
-    break;
-  case 'L': //def
-    digitalWrite(segD, SEGMENT_ON);
-    digitalWrite(segE, SEGMENT_ON);
-    digitalWrite(segF, SEGMENT_ON);
-    break;
-  case 'u': //cde
-    digitalWrite(segC, SEGMENT_ON);
-    digitalWrite(segD, SEGMENT_ON);
-    digitalWrite(segE, SEGMENT_ON);
-    break;
-
-  case 'g': //abcdfg
-    digitalWrite(segA, SEGMENT_ON);
-    digitalWrite(segB, SEGMENT_ON);
-    digitalWrite(segC, SEGMENT_ON);
-    digitalWrite(segD, SEGMENT_ON);
-    digitalWrite(segF, SEGMENT_ON);
-    digitalWrite(segG, SEGMENT_ON);
-    break;
-  case 'r': //eg
-    digitalWrite(segE, SEGMENT_ON);
-    digitalWrite(segG, SEGMENT_ON);
-    break;
-  case 'n': //ceg
-    digitalWrite(segC, SEGMENT_ON);
-    digitalWrite(segE, SEGMENT_ON);
-    digitalWrite(segG, SEGMENT_ON);
-    break;
-
-    //case r
-  case 'e': //adefg
-    digitalWrite(segA, SEGMENT_ON);
-    digitalWrite(segD, SEGMENT_ON);
-    digitalWrite(segE, SEGMENT_ON);
-    digitalWrite(segF, SEGMENT_ON);
-    digitalWrite(segG, SEGMENT_ON);
-    break;
-  case 'd': //bcdeg
-    digitalWrite(segB, SEGMENT_ON);
-    digitalWrite(segC, SEGMENT_ON);
-    digitalWrite(segD, SEGMENT_ON);
-    digitalWrite(segE, SEGMENT_ON);
-    digitalWrite(segG, SEGMENT_ON);
-    break;
-  case ' ': //None
-    digitalWrite(segA, SEGMENT_OFF);
-    digitalWrite(segB, SEGMENT_OFF);
-    digitalWrite(segC, SEGMENT_OFF);
-    digitalWrite(segD, SEGMENT_OFF);
-    digitalWrite(segE, SEGMENT_OFF);
-    digitalWrite(segF, SEGMENT_OFF);
-    digitalWrite(segG, SEGMENT_OFF);
-    break;
-
-  case 'y': //bcdfg
-    digitalWrite(segB, SEGMENT_ON);
-    digitalWrite(segC, SEGMENT_ON);
-    digitalWrite(segD, SEGMENT_ON);
-    digitalWrite(segF, SEGMENT_ON);
-    digitalWrite(segG, SEGMENT_ON);
-    break;
-    //case e 
-    //case L
-  case 'o': //cdeg
-    digitalWrite(segC, SEGMENT_ON);
-    digitalWrite(segD, SEGMENT_ON);
-    digitalWrite(segE, SEGMENT_ON);
-    digitalWrite(segG, SEGMENT_ON);
-    break;
-
-  }
-}
-
-
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
-
-
-
 
