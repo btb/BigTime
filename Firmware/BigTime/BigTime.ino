@@ -69,18 +69,25 @@
 #include <SevSeg.h>
 
 
+#define DISP_OFF       0
+#define DISP_TIME      1
+#define DISP_TIME_WAIT 2
+#define DISP_DATE      3
+#define DISP_DATE_WAIT 4
+#define DISP_SECS      5
+#define DISP_SECS_WAIT 6
+
+
 //Set the 12hourMode to false for military/world time. Set it to true for American 12 hour time.
 int TwelveHourMode = true;
 
 //Set this variable to change how long the time is shown on the watch face. In milliseconds so 1677 = 1.677 seconds
 int show_time_length = 2000;
-int show_the_time = false;
 
-//You can set always_on to true and the display will stay on all the time
-//This will drain the battery in about 15 hours 
-int always_on = false;
+byte state = DISP_OFF;
 
-time_t t;
+time_t tick;
+time_t button_down_time;
 
 SevSeg myDisplay;
 
@@ -91,15 +98,16 @@ int theButton = 2;
 
 //The very important 32.686kHz interrupt handler
 SIGNAL(TIMER2_OVF_vect){
-  t += 8; //We sleep for 8 seconds instead of 1 to save more power
-  //t++; //Use this if we are waking up every second
+  tick += 8; //We sleep for 8 seconds instead of 1 to save more power
+  //tick++; //Use this if we are waking up every second
+  setTime(tick);
 }
 
 //The interrupt occurs when you push the button
 SIGNAL(INT0_vect){
   //When you hit the button, we will need to display the time
-  //if(show_the_time == false) 
-  show_the_time = true;
+  if(state == DISP_OFF) 
+    state = DISP_TIME;
 }
 
 void setup() {                
@@ -170,92 +178,74 @@ void setup() {
   Serial.begin(9600);  
   Serial.println("BigTime Testing:");
 
-  TimeElements tm;
-  tm.Second = 55;
-  tm.Minute = 12;
-  tm.Hour = 8;
-  tm.Day = 31;
-  tm.Month = 12;
-  tm.Year = 2015-1970;
-
-  t = makeTime(tm);
-
-  showTime(); //Show the current time for a few seconds
+  setTime(8, 12, 55, 31, 12, 2015);
+  tick = now();
 
   sei(); //Enable global interrupts
 }
 
 void loop() {
-  if(always_on == false)
+  if (state == DISP_OFF)
     sleep_mode(); //Stop everything and go to sleep. Wake up if the Timer2 buffer overflows or if you hit the button
 
-  if(show_the_time == true || always_on == true) {
-    
-    //Debounce
-    while(digitalRead(theButton) == LOW) ; //Wait for you to remove your finger
-    delay(100);
-    while(digitalRead(theButton) == LOW) ; //Wait for you to remove your finger
-
-    Serial.print(year(t), DEC);
-    Serial.print("-");
-    Serial.print(month(t), DEC);
-    Serial.print("-");
-    Serial.print(day(t), DEC);
-    Serial.print(" ");
-    Serial.print(hour(t), DEC);
-    Serial.print(":");
-    Serial.print(minute(t), DEC);
-    Serial.print(":");
-    Serial.println(second(t), DEC);
-
-    showTime(); //Show the current time for a few seconds
-
-    //If you are STILL holding the button, then you must want to adjust the time
-    if(digitalRead(theButton) == LOW) setTime();
-
-    show_the_time = false; //Reset the button variable
-  }
-}
-
-void showTime() {
-  TimeElements tm;
-  breakTime(t, tm);
-
   char tempString[10];
-  
-  //Do we display 12 hour or 24 hour time?
-  if(TwelveHourMode == true) {
-    //In 12 hour mode, hours go from 12 to 1 to 12.
-    while(tm.Hour > 12) tm.Hour -= 12;
-  }
-  else {
-    //In 24 hour mode, hours go from 0 to 23 to 0.
-    while(tm.Hour > 23) tm.Hour -= 24;
-  }
+  TimeElements tm;
+  breakTime(now(), tm);
 
-  sprintf(tempString, "%2d%2d", tm.Hour, tm.Minute); //Combine the hours and minutes
-  //sprintf(tempString, "%2d%2d", tm.Minute, tm.Second); //For testing, combine the minutes and seconds
-
-  boolean buttonPreviouslyHit = false;
-
-  //Now show the time for a certain length of time
-  long startTime = millis();
-  while( (millis() - startTime) < show_time_length) {
-    myDisplay.DisplayString(tempString, 15);
-
-    //If you have hit and released the button while the display is on, show the date
-    if(digitalRead(theButton) == LOW) {
-      while(digitalRead(theButton) == LOW) ; //Wait for you to remove your finger
-
+  switch(state)
+  {
+    case DISP_TIME:
+    case DISP_TIME_WAIT:
+      if(TwelveHourMode == true) {
+        while(tm.Hour > 12) tm.Hour -= 12;
+        sprintf(tempString, "%2d%02d", tm.Hour, tm.Minute);
+      }
+      else {
+        sprintf(tempString, "%02d%02d", tm.Hour, tm.Minute);
+      }
+      myDisplay.DisplayString(tempString, 2);
+      break;
+    case DISP_DATE:
+    case DISP_DATE_WAIT:
       sprintf(tempString, "%2d%2d", tm.Month, tm.Day);
-      startTime = millis();
-    }
-    else if( (buttonPreviouslyHit == true) && (digitalRead(theButton) == HIGH) ) {
-      return;
-    }      
+      myDisplay.DisplayString(tempString, 0);
+      break;
+    case DISP_SECS:
+    case DISP_SECS_WAIT:
+      sprintf(tempString, "  %02d", tm.Second);
+      myDisplay.DisplayString(tempString, 2);
+      break;
   }
 
+  // continue to display for a certain length of time
+  static boolean waiting = false;
+  static long startTime = millis();
+
+  // button pressed
+  if (digitalRead(theButton) == LOW && millis() > startTime + 100) {
+    switch (state)
+    {
+      case DISP_TIME_WAIT: state = DISP_DATE; break;
+      case DISP_DATE_WAIT: state = DISP_SECS; break;
+      case DISP_SECS_WAIT: state = DISP_TIME; break;
+    }
+    startTime = millis();
+  }
+
+  // button released
+  if (digitalRead(theButton) == HIGH && millis() > startTime + 100) {
+    switch (state)
+    {
+      case DISP_TIME: state = DISP_TIME_WAIT; startTime = millis(); break;
+      case DISP_DATE: state = DISP_DATE_WAIT; startTime = millis(); break;
+      case DISP_SECS: state = DISP_SECS_WAIT; startTime = millis(); break;
+    }
+  }
+
+  if ((millis() - startTime) > show_time_length)
+    state = DISP_OFF;
 }
+
 
 //This routine occurs when you hold the button down
 //The colon blinks indicating we are in this mode
@@ -263,7 +253,7 @@ void showTime() {
 //Releasing the button for more than 2 seconds will exit this mode
 void setTime(void) {
   TimeElements tm;
-  breakTime(t, tm);
+  breakTime(now(), tm);
 
   char tempString[10];
 
@@ -321,7 +311,8 @@ void setTime(void) {
 
     idleMiliseconds += 200;
   }
-  t = makeTime(tm);
+  tick = makeTime(tm);
+  setTime(tick);
 }
 
 //This is a not-so-accurate delay routine
