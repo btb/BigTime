@@ -93,7 +93,7 @@ SevSeg myDisplay;
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //Pin definitions
-int theButton = 2;
+#define BTN_DISP 2
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 //The very important 32.686kHz interrupt handler
@@ -117,8 +117,8 @@ void setup() {
     digitalWrite(x, LOW);
   }
 
-  pinMode(theButton, INPUT); //This is the main button, tied to INT0
-  digitalWrite(theButton, HIGH); //Enable internal pull up on button
+  pinMode(BTN_DISP, INPUT); //This is the main button, tied to INT0
+  digitalWrite(BTN_DISP, HIGH); //Enable internal pull up on button
 
   int displayType = COMMON_CATHODE; //Your display is either common cathode or common anode
 
@@ -222,7 +222,7 @@ void loop() {
   static long startTime = millis();
 
   // button pressed
-  if (digitalRead(theButton) == LOW && millis() > startTime + 100) {
+  if (digitalRead(BTN_DISP) == LOW && millis() > startTime + 100) {
     switch (state)
     {
       case DISP_TIME_WAIT: state = DISP_DATE; break;
@@ -233,7 +233,7 @@ void loop() {
   }
 
   // button released
-  if (digitalRead(theButton) == HIGH && millis() > startTime + 100) {
+  if (digitalRead(BTN_DISP) == HIGH && millis() > startTime + 100) {
     switch (state)
     {
       case DISP_TIME: state = DISP_TIME_WAIT; startTime = millis(); break;
@@ -292,7 +292,7 @@ void setTime(void) {
     myDisplay.DisplayString(tempString, 15);
 
     //If you're still hitting the button, then increase the time and reset the idleMili timeout variable
-    if(digitalRead(theButton) == LOW) {
+    if(digitalRead(BTN_DISP) == LOW) {
       idleMiliseconds = 0;
 
       buttonHold++;
