@@ -313,7 +313,10 @@ void loop() {
         setTime(tick);
         break;
       case SET_YEAR:
-        tm.Year++;
+        if (millis() > startTime + 10000)
+          tm.Year = 0;
+        else
+          tm.Year++;
         dtime = tick = makeTime(tm);
         setTime(tick);
         break;
