@@ -67,6 +67,7 @@
 #include <avr/power.h> //Needed for powering down perihperals such as the ADC/TWI and Timers
 #include <Time.h>
 #include <SevSeg.h>
+#include <Bounce2.h>
 
 
 #define DISP_OFF       0
@@ -85,6 +86,13 @@
 #define SET_12HR      12
 
 
+//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//Pin definitions
+#define BTN_DISP 2
+#define BTN_SET  3
+//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+
 //Set the 12hourMode to false for military/world time. Set it to true for American 12 hour time.
 int TwelveHourMode = true;
 
@@ -97,11 +105,9 @@ time_t tick;
 
 SevSeg myDisplay;
 
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-//Pin definitions
-#define BTN_DISP 2
-#define BTN_SET  3
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Instantiate Bounce objects
+Bounce debDisp = Bounce(); 
+Bounce debSet = Bounce(); 
 
 //The very important 32.686kHz interrupt handler
 SIGNAL(TIMER2_OVF_vect){
@@ -109,6 +115,8 @@ SIGNAL(TIMER2_OVF_vect){
   //tick++; //Use this if we are waking up every second
   setTime(tick);
 }
+
+extern volatile unsigned long timer0_millis;
 
 //The interrupt occurs when you push the button
 SIGNAL(INT0_vect){
@@ -126,9 +134,13 @@ void setup() {
 
   pinMode(BTN_DISP, INPUT); //This is the main button, tied to INT0
   digitalWrite(BTN_DISP, HIGH); //Enable internal pull up on button
+  debDisp.attach(BTN_DISP);
+  debDisp.interval(5); // interval in ms
 
   pinMode(BTN_SET, INPUT); //This is the setting button
   digitalWrite(BTN_SET, HIGH); //Enable internal pull up on button
+  debSet.attach(BTN_SET);
+  debSet.interval(5); // interval in ms
 
   int displayType = COMMON_CATHODE; //Your display is either common cathode or common anode
 
@@ -200,6 +212,9 @@ void loop() {
 
   char tempString[10];
   time_t dtime = now();
+
+  debDisp.update();
+  debSet.update();
 
   switch(state)
   {
@@ -280,7 +295,7 @@ void loop() {
   breakTime(dtime, tm);
 
   // button pressed
-  if (digitalRead(BTN_DISP) == LOW && millis() > startTime + 100) {
+  if (debDisp.read() == LOW && millis() > startTime + 100) {
     switch (state)
     {
       case DISP_TIME_WAIT: state = DISP_DATE; break;
@@ -327,7 +342,7 @@ void loop() {
   }
 
   // button released
-  if (digitalRead(BTN_DISP) == HIGH && millis() > startTime + 100) {
+  if (debDisp.read() == HIGH && millis() > startTime + 100) {
     switch (state)
     {
       case DISP_TIME: state = DISP_TIME_WAIT; startTime = millis(); break;
@@ -337,7 +352,7 @@ void loop() {
   }
 
   // set button pressed
-  if (digitalRead(BTN_SET) == LOW && millis() > startTime + 100) {
+  if (debSet.read() == LOW) {
     if (millis() > setBtnTime + 1000) { // repeat rate
       switch (state)
       {
@@ -354,7 +369,7 @@ void loop() {
   }
 
   // set button released
-  if (digitalRead(BTN_SET) == HIGH && millis() > startTime + 100) {
+  if (debSet.read() == HIGH) {
     switch (state)
     {
       case SET_HOUR:
