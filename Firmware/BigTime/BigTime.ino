@@ -77,6 +77,13 @@
 #define DISP_SECS      5
 #define DISP_SECS_WAIT 6
 
+#define SET_HOUR       7
+#define SET_MINUTE     8
+#define SET_MONTH      9
+#define SET_DAY       10
+#define SET_YEAR      11
+#define SET_12HR      12
+
 
 //Set the 12hourMode to false for military/world time. Set it to true for American 12 hour time.
 int TwelveHourMode = true;
@@ -87,13 +94,13 @@ int show_time_length = 2000;
 byte state = DISP_OFF;
 
 time_t tick;
-time_t button_down_time;
 
 SevSeg myDisplay;
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //Pin definitions
 #define BTN_DISP 2
+#define BTN_SET  3
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 //The very important 32.686kHz interrupt handler
@@ -119,6 +126,9 @@ void setup() {
 
   pinMode(BTN_DISP, INPUT); //This is the main button, tied to INT0
   digitalWrite(BTN_DISP, HIGH); //Enable internal pull up on button
+
+  pinMode(BTN_SET, INPUT); //This is the setting button
+  digitalWrite(BTN_SET, HIGH); //Enable internal pull up on button
 
   int displayType = COMMON_CATHODE; //Your display is either common cathode or common anode
 
@@ -189,37 +199,85 @@ void loop() {
     sleep_mode(); //Stop everything and go to sleep. Wake up if the Timer2 buffer overflows or if you hit the button
 
   char tempString[10];
-  TimeElements tm;
-  breakTime(now(), tm);
+  time_t dtime = now();
 
   switch(state)
   {
     case DISP_TIME:
     case DISP_TIME_WAIT:
-      if(TwelveHourMode == true) {
-        while(tm.Hour > 12) tm.Hour -= 12;
-        sprintf(tempString, "%2d%02d", tm.Hour, tm.Minute);
-      }
-      else {
-        sprintf(tempString, "%02d%02d", tm.Hour, tm.Minute);
-      }
-      myDisplay.DisplayString(tempString, 2);
+      if (TwelveHourMode == true)
+        sprintf(tempString, "%2d%02d", hourFormat12(dtime), minute(dtime));
+      else
+        sprintf(tempString, "%02d%02d", hour(dtime), minute(dtime));
+      if (millis() % 1000 < 500)
+        myDisplay.DisplayString(tempString, 0);
+      else
+        myDisplay.DisplayString(tempString, 2);
       break;
     case DISP_DATE:
     case DISP_DATE_WAIT:
-      sprintf(tempString, "%2d%2d", tm.Month, tm.Day);
+      sprintf(tempString, "%2d%2d", month(dtime), day(dtime));
       myDisplay.DisplayString(tempString, 0);
       break;
     case DISP_SECS:
     case DISP_SECS_WAIT:
-      sprintf(tempString, "  %02d", tm.Second);
+      sprintf(tempString, "  %02d", second(dtime));
       myDisplay.DisplayString(tempString, 2);
+      break;
+
+    case SET_HOUR:
+      if (TwelveHourMode == true)
+        sprintf(tempString, "%2d%02d", hourFormat12(dtime), minute(dtime));
+      else
+        sprintf(tempString, "%02d%02d", hour(dtime), minute(dtime));
+      if (millis() % 1000 < 500)
+        tempString[0] = tempString[1] = ' ';
+      myDisplay.DisplayString(tempString, 2);
+      break;
+    case SET_MINUTE:
+      if (TwelveHourMode == true)
+        sprintf(tempString, "%2d%02d", hourFormat12(dtime), minute(dtime));
+      else
+        sprintf(tempString, "%02d%02d", hour(dtime), minute(dtime));
+      if (millis() % 1000 < 500)
+        tempString[2] = tempString[3] = ' ';
+      myDisplay.DisplayString(tempString, 2);
+      break;
+    case SET_MONTH:
+      sprintf(tempString, "%2d%2d", month(dtime), day(dtime));
+      if (millis() % 1000 < 500)
+        tempString[0] = tempString[1] = ' ';
+      myDisplay.DisplayString(tempString, 0);
+      break;
+    case SET_DAY:
+      sprintf(tempString, "%2d%2d", month(dtime), day(dtime));
+      if (millis() % 1000 < 500)
+        tempString[2] = tempString[3] = ' ';
+      myDisplay.DisplayString(tempString, 0);
+      break;
+    case SET_YEAR:
+      if (millis() % 1000 < 500)
+        sprintf(tempString, "    ");
+      else
+        sprintf(tempString, "%04d  ", year(dtime));
+      myDisplay.DisplayString(tempString, 0);
+      break;
+    case SET_12HR:
+      if (millis() % 1000 < 500)
+        sprintf(tempString, "    ");
+      else if (TwelveHourMode == true)
+        sprintf(tempString, "12hr");
+      else
+        sprintf(tempString, "24hr");
+      myDisplay.DisplayString(tempString, 0);
       break;
   }
 
   // continue to display for a certain length of time
-  static boolean waiting = false;
   static long startTime = millis();
+  static long setBtnTime = millis();
+  TimeElements tm;
+  breakTime(dtime, tm);
 
   // button pressed
   if (digitalRead(BTN_DISP) == LOW && millis() > startTime + 100) {
@@ -228,6 +286,39 @@ void loop() {
       case DISP_TIME_WAIT: state = DISP_DATE; break;
       case DISP_DATE_WAIT: state = DISP_SECS; break;
       case DISP_SECS_WAIT: state = DISP_TIME; break;
+      case SET_HOUR:
+        tm.Hour++;
+        tm.Hour %= 24;
+        dtime = tick = makeTime(tm);
+        setTime(tick);
+        break;
+      case SET_MINUTE:
+        tm.Minute++;
+        tm.Minute %= 60;
+        tm.Second = 0;
+        dtime = tick = makeTime(tm);
+        setTime(tick);
+        break;
+      case SET_MONTH:
+        tm.Month++;
+        if (tm.Month > 12) tm.Month = 1;
+        if (tm.Day > monthLength(tm.Year, tm.Month)) tm.Day = monthLength(tm.Year, tm.Month);
+        dtime = tick = makeTime(tm);
+        setTime(tick);
+        break;
+      case SET_DAY:
+        tm.Day++;
+        if (tm.Day > monthLength(tm.Year, tm.Month)) tm.Day = 1;
+        dtime = tick = makeTime(tm);
+        setTime(tick);
+        break;
+      case SET_YEAR:
+        tm.Year++;
+        dtime = tick = makeTime(tm);
+        setTime(tick);
+        break;
+      case SET_12HR:
+        TwelveHourMode = !TwelveHourMode;
     }
     startTime = millis();
   }
@@ -242,99 +333,59 @@ void loop() {
     }
   }
 
+  // set button pressed
+  if (digitalRead(BTN_SET) == LOW && millis() > startTime + 100) {
+    if (millis() > setBtnTime + 1000) { // repeat rate
+      switch (state)
+      {
+        case DISP_TIME_WAIT: state = SET_HOUR;   break;
+        case SET_HOUR:       state = SET_MINUTE; break;
+        case SET_MINUTE:     state = SET_MONTH;  break;
+        case SET_MONTH:      state = SET_DAY;    break;
+        case SET_DAY:        state = SET_YEAR;   break;
+        case SET_YEAR:       state = SET_12HR;   break;
+        case SET_12HR:       state = SET_HOUR;   break;
+      }
+      startTime = setBtnTime = millis();
+    }
+  }
+
+  // set button released
+  if (digitalRead(BTN_SET) == HIGH && millis() > startTime + 100) {
+    switch (state)
+    {
+      case SET_HOUR:
+      case SET_MINUTE:
+      case SET_MONTH:
+      case SET_DAY:
+      case SET_YEAR:
+      case SET_12HR:
+        setBtnTime = 0;
+        break;
+    }
+  }
+
   if ((millis() - startTime) > show_time_length)
     state = DISP_OFF;
 }
 
 
-//This routine occurs when you hold the button down
-//The colon blinks indicating we are in this mode
-//Holding the button down will increase the time (accelerates)
-//Releasing the button for more than 2 seconds will exit this mode
-void setTime(void) {
-  TimeElements tm;
-  breakTime(now(), tm);
-
-  char tempString[10];
-
-  int idleMiliseconds = 0;
-  //This is the timeout counter. Once we get to ~2 seconds of inactivity, the watch
-  //will exit the setTime function and return to normal operation
-
-  int buttonHold = 0; 
-  //This counts the number of times you are holding the button down consecutively
-  //Once we notice you're really holding the button down a lot, we will speed up the minute counter
-
-  while(idleMiliseconds < 2000) {
-
-    cli(); //We don't want the interrupt changing values at the same time we are!
-
-    //Update the minutes and hours variables
-    tm.Minute += tm.Second / 60; //Example: seconds = 2317, minutes = 58 + 38 = 96
-    tm.Second %= 60; //seconds = 37
-    tm.Hour += tm.Minute / 60; //12 + (96 / 60) = 13
-    tm.Minute %= 60; //minutes = 36
-
-    //Do we display 12 hour or 24 hour time?
-    if(TwelveHourMode == true) {
-      //In 12 hour mode, hours go from 12 to 1 to 12.
-      while(tm.Hour > 12) tm.Hour -= 12;
-    }
-    else {
-      //In 24 hour mode, hours go from 0 to 23 to 0.
-      while(tm.Hour > 23) tm.Hour -= 24;
-    }
-
-    sei(); //Resume interrupts
-
-    sprintf(tempString, "%2d%2d", tm.Hour, tm.Minute); //Combine the hours and minutes
-
-    myDisplay.DisplayString(tempString, 15);
-
-    //If you're still hitting the button, then increase the time and reset the idleMili timeout variable
-    if(digitalRead(BTN_DISP) == LOW) {
-      idleMiliseconds = 0;
-
-      buttonHold++;
-      if(buttonHold < 10) //10 = 2 seconds
-        tm.Minute++; //Advance the minutes
-      else {
-        //Advance the minutes faster because you're holding the button for 10 seconds
-        //Start advancing on the tens digit. Floor the single minute digit.
-        tm.Minute /= 10; //minutes = 46 / 10 = 4
-        tm.Minute *= 10; //minutes = 4 * 10 = 40
-        tm.Minute += 10;  //minutes = 40 + 10 = 50
-      }
-    }
-    else
-      buttonHold = 0;
-
-    idleMiliseconds += 200;
+int monthLength(int tmYear, int month)
+{
+  switch (month)
+  {
+    case 1: case 3: case 5: case 7: case 8: case 10: case 12:
+      return 31;
+    case 4: case 6: case 9: case 11:
+      return 30;
+    case 2:
+      TimeElements tm;
+      tm.Year = tmYear;
+      tm.Month = 3;
+      tm.Day = 1;
+      tm.Hour = tm.Minute = tm.Second = 0;
+      breakTime(makeTime(tm) - SECS_PER_DAY, tm);
+      return tm.Day;
   }
-  tick = makeTime(tm);
-  setTime(tick);
 }
-
-//This is a not-so-accurate delay routine
-//Calling fake_msdelay(100) will delay for about 100ms
-//Assumes 8MHz clock
-/*void fake_msdelay(int x){
- for( ; x > 0 ; x--)
- fake_usdelay(1000);
- }*/
-
-//This is a not-so-accurate delay routine
-//Calling fake_usdelay(100) will delay for about 100us
-//Assumes 8MHz clock
-/*void fake_usdelay(int x){
- for( ; x > 0 ; x--) {
- __asm__("nop\n\t"); 
- __asm__("nop\n\t"); 
- __asm__("nop\n\t"); 
- __asm__("nop\n\t"); 
- __asm__("nop\n\t"); 
- __asm__("nop\n\t"); 
- __asm__("nop\n\t"); 
- }
- }*/
 
