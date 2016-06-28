@@ -121,8 +121,16 @@ extern volatile unsigned long timer0_millis;
 //The interrupt occurs when you push the button
 SIGNAL(INT0_vect){
   //When you hit the button, we will need to display the time
-  if(state == DISP_OFF) 
+  if(state == DISP_OFF) {
     state = DISP_TIME;
+
+    // since tick hasn't happened yet, update clock
+    setTime(tick + TCNT2 / 32); // 8 secs every 256 counter increments
+    uint8_t oldSREG = SREG;
+    cli();
+    timer0_millis += 31.25 * (TCNT2 % 32); // add leftover 32ths of a second to millis for full synchronization
+    SREG = oldSREG;
+  }
 }
 
 void setup() {                
