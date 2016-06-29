@@ -152,19 +152,19 @@ void setup() {
 
   int displayType = COMMON_CATHODE; //Your display is either common cathode or common anode
 
-  int digit1 = 9; //Display pin 1
-  int digit2 = 10; //Display pin 10
-  int digit3 = A0; //Display pin 4
-  int digit4 = A1; //Display pin 6
+  int digit1 =  6; //Display pin 1
+  int digit2 =  9; //Display pin 10
+  int digit3 = 12; //Display pin 4
+  int digit4 = A2; //Display pin 6
 
-  int segA = 6; //Display pin 12
-  int segB = 8; //Display pin 11
-  int segC = 5; //Display pin 3
-  int segD = 11; //Display pin 8
-  int segE = 13; //Display pin 2
-  int segF = 4; //Display pin 9
-  int segG = 7; //Display pin 7
-  int segDP = 12; //Display pin 5
+  int segA  =  5; //Display pin 12
+  int segB  =  7; //Display pin 11
+  int segC  = 10; //Display pin 3
+  int segD  = 13; //Display pin 8
+  int segE  =  8; //Display pin 2
+  int segF  = 11; //Display pin 9
+  int segG  = A1; //Display pin 7
+  int segDP = A0; //Display pin 5
    
   int numberOfDigits = 4; //Do you have a 1, 2 or 4 digit display?
 
