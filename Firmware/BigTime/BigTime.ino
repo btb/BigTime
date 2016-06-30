@@ -117,6 +117,7 @@ SIGNAL(TIMER2_OVF_vect){
 }
 
 extern volatile unsigned long timer0_millis;
+unsigned long interrupt_millis;
 
 //The interrupt occurs when you push the button
 SIGNAL(INT0_vect){
@@ -130,6 +131,8 @@ SIGNAL(INT0_vect){
     cli();
     timer0_millis += 31.25 * (TCNT2 % 32); // add leftover 32ths of a second to millis for full synchronization
     SREG = oldSREG;
+
+    interrupt_millis = millis();
   }
 }
 
@@ -353,7 +356,11 @@ void loop() {
   if (debDisp.read() == HIGH && millis() > startTime + 100) {
     switch (state)
     {
-      case DISP_TIME: state = DISP_TIME_WAIT; startTime = millis(); break;
+      case DISP_TIME:
+        if (millis() > interrupt_millis + 50) // debounce
+          state = DISP_TIME_WAIT;
+        startTime = millis();
+        break;
       case DISP_DATE: state = DISP_DATE_WAIT; startTime = millis(); break;
       case DISP_SECS: state = DISP_SECS_WAIT; startTime = millis(); break;
     }
