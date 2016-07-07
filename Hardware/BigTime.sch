@@ -8,34 +8,34 @@
 </settings>
 <grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
-<layer number="1" name="Top" color="4" fill="1" visible="yes" active="no"/>
-<layer number="2" name="Route2" color="1" fill="3" visible="yes" active="no"/>
-<layer number="3" name="Route3" color="4" fill="3" visible="yes" active="no"/>
-<layer number="4" name="Route4" color="1" fill="4" visible="yes" active="no"/>
-<layer number="5" name="Route5" color="4" fill="4" visible="yes" active="no"/>
-<layer number="6" name="Route6" color="1" fill="8" visible="yes" active="no"/>
-<layer number="7" name="Route7" color="4" fill="8" visible="yes" active="no"/>
-<layer number="8" name="Route8" color="1" fill="2" visible="yes" active="no"/>
-<layer number="9" name="Route9" color="4" fill="2" visible="yes" active="no"/>
-<layer number="10" name="Route10" color="1" fill="7" visible="yes" active="no"/>
-<layer number="11" name="Route11" color="4" fill="7" visible="yes" active="no"/>
-<layer number="12" name="Route12" color="1" fill="5" visible="yes" active="no"/>
-<layer number="13" name="Route13" color="4" fill="5" visible="yes" active="no"/>
-<layer number="14" name="Route14" color="1" fill="6" visible="yes" active="no"/>
-<layer number="15" name="Route15" color="4" fill="6" visible="yes" active="no"/>
-<layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="no"/>
-<layer number="17" name="Pads" color="2" fill="1" visible="yes" active="no"/>
-<layer number="18" name="Vias" color="2" fill="1" visible="yes" active="no"/>
-<layer number="19" name="Unrouted" color="14" fill="1" visible="yes" active="no"/>
-<layer number="20" name="Dimension" color="15" fill="1" visible="yes" active="no"/>
-<layer number="21" name="tPlace" color="16" fill="1" visible="yes" active="no"/>
-<layer number="22" name="bPlace" color="14" fill="1" visible="yes" active="no"/>
-<layer number="23" name="tOrigins" color="15" fill="1" visible="yes" active="no"/>
-<layer number="24" name="bOrigins" color="15" fill="1" visible="yes" active="no"/>
-<layer number="25" name="tNames" color="7" fill="1" visible="yes" active="no"/>
-<layer number="26" name="bNames" color="7" fill="1" visible="yes" active="no"/>
-<layer number="27" name="tValues" color="7" fill="1" visible="yes" active="no"/>
-<layer number="28" name="bValues" color="7" fill="1" visible="yes" active="no"/>
+<layer number="1" name="Top" color="4" fill="1" visible="no" active="no"/>
+<layer number="2" name="Route2" color="1" fill="3" visible="no" active="no"/>
+<layer number="3" name="Route3" color="4" fill="3" visible="no" active="no"/>
+<layer number="4" name="Route4" color="1" fill="4" visible="no" active="no"/>
+<layer number="5" name="Route5" color="4" fill="4" visible="no" active="no"/>
+<layer number="6" name="Route6" color="1" fill="8" visible="no" active="no"/>
+<layer number="7" name="Route7" color="4" fill="8" visible="no" active="no"/>
+<layer number="8" name="Route8" color="1" fill="2" visible="no" active="no"/>
+<layer number="9" name="Route9" color="4" fill="2" visible="no" active="no"/>
+<layer number="10" name="Route10" color="1" fill="7" visible="no" active="no"/>
+<layer number="11" name="Route11" color="4" fill="7" visible="no" active="no"/>
+<layer number="12" name="Route12" color="1" fill="5" visible="no" active="no"/>
+<layer number="13" name="Route13" color="4" fill="5" visible="no" active="no"/>
+<layer number="14" name="Route14" color="1" fill="6" visible="no" active="no"/>
+<layer number="15" name="Route15" color="4" fill="6" visible="no" active="no"/>
+<layer number="16" name="Bottom" color="1" fill="1" visible="no" active="no"/>
+<layer number="17" name="Pads" color="2" fill="1" visible="no" active="no"/>
+<layer number="18" name="Vias" color="2" fill="1" visible="no" active="no"/>
+<layer number="19" name="Unrouted" color="14" fill="1" visible="no" active="no"/>
+<layer number="20" name="Dimension" color="15" fill="1" visible="no" active="no"/>
+<layer number="21" name="tPlace" color="16" fill="1" visible="no" active="no"/>
+<layer number="22" name="bPlace" color="14" fill="1" visible="no" active="no"/>
+<layer number="23" name="tOrigins" color="15" fill="1" visible="no" active="no"/>
+<layer number="24" name="bOrigins" color="15" fill="1" visible="no" active="no"/>
+<layer number="25" name="tNames" color="7" fill="1" visible="no" active="no"/>
+<layer number="26" name="bNames" color="7" fill="1" visible="no" active="no"/>
+<layer number="27" name="tValues" color="7" fill="1" visible="no" active="no"/>
+<layer number="28" name="bValues" color="7" fill="1" visible="no" active="no"/>
 <layer number="29" name="tStop" color="7" fill="3" visible="no" active="no"/>
 <layer number="30" name="bStop" color="7" fill="6" visible="no" active="no"/>
 <layer number="31" name="tCream" color="7" fill="4" visible="no" active="no"/>
@@ -44,8 +44,8 @@
 <layer number="34" name="bFinish" color="6" fill="6" visible="no" active="no"/>
 <layer number="35" name="tGlue" color="7" fill="4" visible="no" active="no"/>
 <layer number="36" name="bGlue" color="7" fill="5" visible="no" active="no"/>
-<layer number="37" name="tTest" color="7" fill="1" visible="yes" active="no"/>
-<layer number="38" name="bTest" color="7" fill="1" visible="yes" active="no"/>
+<layer number="37" name="tTest" color="7" fill="1" visible="no" active="no"/>
+<layer number="38" name="bTest" color="7" fill="1" visible="no" active="no"/>
 <layer number="39" name="tKeepout" color="4" fill="11" visible="no" active="no"/>
 <layer number="40" name="bKeepout" color="1" fill="11" visible="no" active="no"/>
 <layer number="41" name="tRestrict" color="4" fill="10" visible="no" active="no"/>
@@ -53,19 +53,19 @@
 <layer number="43" name="vRestrict" color="2" fill="10" visible="no" active="no"/>
 <layer number="44" name="Drills" color="7" fill="1" visible="no" active="no"/>
 <layer number="45" name="Holes" color="7" fill="1" visible="no" active="no"/>
-<layer number="46" name="Milling" color="3" fill="1" visible="yes" active="no"/>
-<layer number="47" name="Measures" color="7" fill="1" visible="yes" active="no"/>
-<layer number="48" name="Document" color="7" fill="1" visible="yes" active="no"/>
-<layer number="49" name="Reference" color="7" fill="1" visible="yes" active="no"/>
-<layer number="50" name="dxf" color="7" fill="1" visible="yes" active="no"/>
-<layer number="51" name="tDocu" color="6" fill="1" visible="yes" active="no"/>
-<layer number="52" name="bDocu" color="7" fill="1" visible="yes" active="no"/>
-<layer number="53" name="tGND_GNDA" color="7" fill="9" visible="yes" active="no"/>
-<layer number="54" name="bGND_GNDA" color="1" fill="9" visible="yes" active="no"/>
-<layer number="56" name="wert" color="7" fill="1" visible="yes" active="no"/>
-<layer number="57" name="tCAD" color="7" fill="1" visible="yes" active="no"/>
-<layer number="59" name="tCarbon" color="7" fill="1" visible="yes" active="no"/>
-<layer number="60" name="bCarbon" color="7" fill="1" visible="yes" active="no"/>
+<layer number="46" name="Milling" color="3" fill="1" visible="no" active="no"/>
+<layer number="47" name="Measures" color="7" fill="1" visible="no" active="no"/>
+<layer number="48" name="Document" color="7" fill="1" visible="no" active="no"/>
+<layer number="49" name="Reference" color="7" fill="1" visible="no" active="no"/>
+<layer number="50" name="dxf" color="7" fill="1" visible="no" active="no"/>
+<layer number="51" name="tDocu" color="6" fill="1" visible="no" active="no"/>
+<layer number="52" name="bDocu" color="7" fill="1" visible="no" active="no"/>
+<layer number="53" name="tGND_GNDA" color="7" fill="9" visible="no" active="no"/>
+<layer number="54" name="bGND_GNDA" color="1" fill="9" visible="no" active="no"/>
+<layer number="56" name="wert" color="7" fill="1" visible="no" active="no"/>
+<layer number="57" name="tCAD" color="7" fill="1" visible="no" active="no"/>
+<layer number="59" name="tCarbon" color="7" fill="1" visible="no" active="no"/>
+<layer number="60" name="bCarbon" color="7" fill="1" visible="no" active="no"/>
 <layer number="90" name="Modules" color="5" fill="1" visible="yes" active="yes"/>
 <layer number="91" name="Nets" color="2" fill="1" visible="yes" active="yes"/>
 <layer number="92" name="Busses" color="1" fill="1" visible="yes" active="yes"/>
@@ -9114,21 +9114,20 @@ Standard 1-pin 0.1" header. Use with straight break away headers (SKU : PRT-0011
 <part name="P+1" library="SparkFun" deviceset="VCC" device=""/>
 <part name="JP1" library="BigTime" deviceset="FTDI_DEVICE" device="RA_SMT"/>
 <part name="GND3" library="SparkFun" deviceset="GND" device=""/>
-<part name="C1" library="resistor" deviceset="C-EU" device="C0201" value="100nF"/>
-<part name="C2" library="resistor" deviceset="C-EU" device="C0201" value="100nF"/>
-<part name="R1" library="resistor" deviceset="R-US_" device="R0201" value="100k"/>
+<part name="C1" library="resistor" deviceset="C-EU" device="C0402" value="100nF"/>
+<part name="C2" library="resistor" deviceset="C-EU" device="C0402" value="100nF"/>
 <part name="Y1" library="BigTime" deviceset="CRYSTAL" device="TC26H" value="32.768kHz"/>
 <part name="P+4" library="SparkFun" deviceset="VCC" device=""/>
 <part name="DISP1" library="BigTime" deviceset="7-SEGMENT-4DIGIT-COUNTER" device="-HP-BUBBLE-SM" value="7-SEGMENT-4DIGIT-COUNTER-HP-BUBBLE-SM"/>
 <part name="U2" library="SparkFun-DigitalIC" deviceset="ATMEGA328P_TQFP" device="" value="ATMEGA328P_TQFP"/>
-<part name="R2" library="resistor" deviceset="R-US_" device="R0201" value="330"/>
-<part name="R3" library="resistor" deviceset="R-US_" device="R0201" value="330"/>
-<part name="R4" library="resistor" deviceset="R-US_" device="R0201" value="330"/>
-<part name="R5" library="resistor" deviceset="R-US_" device="R0201" value="330"/>
-<part name="R6" library="resistor" deviceset="R-US_" device="R0201" value="330"/>
-<part name="R7" library="resistor" deviceset="R-US_" device="R0201" value="330"/>
-<part name="R8" library="resistor" deviceset="R-US_" device="R0201" value="330"/>
-<part name="R9" library="resistor" deviceset="R-US_" device="R0201" value="330"/>
+<part name="R2" library="resistor" deviceset="R-US_" device="R0402" value="330"/>
+<part name="R3" library="resistor" deviceset="R-US_" device="R0402" value="330"/>
+<part name="R4" library="resistor" deviceset="R-US_" device="R0402" value="330"/>
+<part name="R5" library="resistor" deviceset="R-US_" device="R0402" value="330"/>
+<part name="R6" library="resistor" deviceset="R-US_" device="R0402" value="330"/>
+<part name="R7" library="resistor" deviceset="R-US_" device="R0402" value="330"/>
+<part name="R8" library="resistor" deviceset="R-US_" device="R0402" value="330"/>
+<part name="R9" library="resistor" deviceset="R-US_" device="R0402" value="330"/>
 <part name="BAT+" library="testpad" deviceset="TP" device="TP20R"/>
 <part name="GND1" library="SparkFun" deviceset="GND" device=""/>
 <part name="TP3" library="SparkFun-Connectors" deviceset="M01" device="PTH"/>
@@ -9186,12 +9185,11 @@ Standard 1-pin 0.1" header. Use with straight break away headers (SKU : PRT-0011
 </plain>
 <instances>
 <instance part="GND2" gate="1" x="99.06" y="99.06"/>
-<instance part="P+1" gate="1" x="88.9" y="177.8"/>
+<instance part="P+1" gate="1" x="99.06" y="167.64"/>
 <instance part="JP1" gate="G$1" x="53.34" y="154.94" rot="MR0"/>
 <instance part="GND3" gate="1" x="60.96" y="142.24"/>
 <instance part="C1" gate="G$1" x="76.2" y="160.02" rot="R90"/>
 <instance part="C2" gate="G$1" x="48.26" y="119.38"/>
-<instance part="R1" gate="G$1" x="88.9" y="167.64" rot="R90"/>
 <instance part="Y1" gate="G$1" x="88.9" y="132.08" rot="R270"/>
 <instance part="P+4" gate="1" x="58.42" y="121.92"/>
 <instance part="DISP1" gate="G$1" x="53.34" y="66.04"/>
@@ -9278,21 +9276,15 @@ Standard 1-pin 0.1" header. Use with straight break away headers (SKU : PRT-0011
 </net>
 <net name="RST" class="0">
 <segment>
-<wire x1="81.28" y1="160.02" x2="88.9" y2="160.02" width="0.1524" layer="91"/>
-<wire x1="88.9" y1="162.56" x2="88.9" y2="160.02" width="0.1524" layer="91"/>
-<junction x="88.9" y="160.02"/>
 <label x="81.28" y="160.02" size="1.778" layer="95"/>
-<wire x1="88.9" y1="160.02" x2="101.6" y2="160.02" width="0.1524" layer="91"/>
+<wire x1="81.28" y1="160.02" x2="101.6" y2="160.02" width="0.1524" layer="91"/>
 <pinref part="C1" gate="G$1" pin="2"/>
-<pinref part="R1" gate="G$1" pin="1"/>
 <pinref part="U2" gate="U$1" pin="PC6(/RESET)"/>
 </segment>
 </net>
 <net name="VCC" class="0">
 <segment>
-<wire x1="88.9" y1="177.8" x2="88.9" y2="175.26" width="0.1524" layer="91"/>
 <pinref part="P+1" gate="1" pin="VCC"/>
-<wire x1="88.9" y1="175.26" x2="88.9" y2="172.72" width="0.1524" layer="91"/>
 <wire x1="101.6" y1="144.78" x2="99.06" y2="144.78" width="0.1524" layer="91"/>
 <wire x1="99.06" y1="144.78" x2="99.06" y2="149.86" width="0.1524" layer="91"/>
 <wire x1="99.06" y1="149.86" x2="99.06" y2="152.4" width="0.1524" layer="91"/>
@@ -9300,11 +9292,8 @@ Standard 1-pin 0.1" header. Use with straight break away headers (SKU : PRT-0011
 <wire x1="99.06" y1="152.4" x2="99.06" y2="154.94" width="0.1524" layer="91"/>
 <junction x="99.06" y="152.4"/>
 <wire x1="99.06" y1="154.94" x2="101.6" y2="154.94" width="0.1524" layer="91"/>
-<wire x1="99.06" y1="154.94" x2="99.06" y2="175.26" width="0.1524" layer="91"/>
+<wire x1="99.06" y1="154.94" x2="99.06" y2="167.64" width="0.1524" layer="91"/>
 <junction x="99.06" y="154.94"/>
-<wire x1="99.06" y1="175.26" x2="88.9" y2="175.26" width="0.1524" layer="91"/>
-<junction x="88.9" y="175.26"/>
-<pinref part="R1" gate="G$1" pin="2"/>
 <pinref part="U2" gate="U$1" pin="VCC@4"/>
 <pinref part="U2" gate="U$1" pin="AREF"/>
 <pinref part="U2" gate="U$1" pin="AVCC"/>
@@ -9401,9 +9390,9 @@ Standard 1-pin 0.1" header. Use with straight break away headers (SKU : PRT-0011
 <pinref part="R5" gate="G$1" pin="1"/>
 </segment>
 <segment>
-<wire x1="149.86" y1="106.68" x2="162.56" y2="106.68" width="0.1524" layer="91"/>
-<label x="154.94" y="106.68" size="1.778" layer="95"/>
-<pinref part="U2" gate="U$1" pin="PB3(MOSI/OC2)"/>
+<wire x1="149.86" y1="109.22" x2="162.56" y2="109.22" width="0.1524" layer="91"/>
+<label x="154.94" y="109.22" size="1.778" layer="95"/>
+<pinref part="U2" gate="U$1" pin="PB2(SS/OC1B)"/>
 </segment>
 </net>
 <net name="E" class="0">
@@ -9578,9 +9567,9 @@ Standard 1-pin 0.1" header. Use with straight break away headers (SKU : PRT-0011
 <label x="71.12" y="27.94" size="1.778" layer="95" rot="R90"/>
 </segment>
 <segment>
-<wire x1="149.86" y1="109.22" x2="162.56" y2="109.22" width="0.1524" layer="91"/>
-<label x="154.94" y="109.22" size="1.778" layer="95"/>
-<pinref part="U2" gate="U$1" pin="PB2(SS/OC1B)"/>
+<wire x1="149.86" y1="106.68" x2="162.56" y2="106.68" width="0.1524" layer="91"/>
+<label x="154.94" y="106.68" size="1.778" layer="95"/>
+<pinref part="U2" gate="U$1" pin="PB3(MOSI/OC2)"/>
 </segment>
 </net>
 <net name="8" class="0">
