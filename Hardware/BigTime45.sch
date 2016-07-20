@@ -9550,6 +9550,10 @@ This is the reduced ISP connector for AVR programming. Common on Arduino. This f
 <label x="154.94" y="101.6" size="1.778" layer="95"/>
 <pinref part="U2" gate="U$1" pin="PB5(SCK)"/>
 </segment>
+<segment>
+<pinref part="J1" gate="G$1" pin="3"/>
+<wire x1="45.72" y1="149.86" x2="53.34" y2="149.86" width="0.1524" layer="91"/>
+</segment>
 </net>
 <net name="B" class="0">
 <segment>
@@ -9596,10 +9600,6 @@ This is the reduced ISP connector for AVR programming. Common on Arduino. This f
 <label x="220.98" y="111.76" size="1.778" layer="95" rot="R90"/>
 <wire x1="220.98" y1="116.84" x2="220.98" y2="109.22" width="0.1524" layer="91"/>
 <pinref part="R6" gate="G$1" pin="1"/>
-</segment>
-<segment>
-<pinref part="J1" gate="G$1" pin="3"/>
-<wire x1="45.72" y1="149.86" x2="53.34" y2="149.86" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <wire x1="149.86" y1="160.02" x2="162.56" y2="160.02" width="0.1524" layer="91"/>
