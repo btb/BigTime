@@ -9305,7 +9305,7 @@ This is the reduced ISP connector for AVR programming. Common on Arduino. This f
 <parts>
 <part name="GND2" library="SparkFun" deviceset="GND" device=""/>
 <part name="P+1" library="SparkFun" deviceset="VCC" device=""/>
-<part name="C2" library="resistor" deviceset="C-EU" device="C0402" value="100nF"/>
+<part name="C2" library="resistor" deviceset="C-EU" device="C0805" value="100nF"/>
 <part name="Y1" library="BigTime" deviceset="CRYSTAL" device="TC26H" value="32.768kHz"/>
 <part name="P+4" library="SparkFun" deviceset="VCC" device=""/>
 <part name="DISP1" library="BigTime" deviceset="7-SEGMENT-4DIGIT-COUNTER" device="-HP-BUBBLE-SM" value="7-SEGMENT-4DIGIT-COUNTER-HP-BUBBLE-SM"/>
