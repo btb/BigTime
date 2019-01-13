@@ -66,7 +66,7 @@
 #include <avr/sleep.h> //Needed for sleep_mode
 #include <avr/power.h> //Needed for powering down perihperals such as the ADC/TWI and Timers
 #include <TimeLib.h>
-#include <SevSeg.h>
+#include <SevSeg.h> //This is the old SparkFun version
 #include <Bounce2.h>
 
 
