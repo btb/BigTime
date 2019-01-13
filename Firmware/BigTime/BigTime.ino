@@ -70,6 +70,9 @@
 #include <Bounce2.h>
 
 
+#define BREADBOARD_VERSION
+
+
 #define DISP_OFF       0
 #define DISP_TIME      1
 #define DISP_TIME_WAIT 2
@@ -155,6 +158,21 @@ void setup() {
 
   int displayType = COMMON_CATHODE; //Your display is either common cathode or common anode
 
+#ifdef BREADBOARD_VERSION
+  int digit1 = A2; //Display pin 1
+  int digit2 = 11; //Display pin 10
+  int digit3 = 10; //Display pin 4
+  int digit4 =  6; //Display pin 6
+
+  int segA  = A1; //Display pin 12
+  int segB  = 13; //Display pin 11
+  int segC  = 12; //Display pin 3
+  int segD  =  7; //Display pin 8
+  int segE  = A0; //Display pin 2
+  int segF  =  9; //Display pin 9
+  int segG  =  5; //Display pin 7
+  int segDP =  8; //Display pin 5
+#else
   int digit1 = A6; //Display pin 1
   int digit2 = 11; //Display pin 10
   int digit3 =  8; //Display pin 4
@@ -168,6 +186,7 @@ void setup() {
   int segF  = 10; //Display pin 9
   int segG  =  7; //Display pin 7
   int segDP =  5; //Display pin 5
+#endif
    
   int numberOfDigits = 4; //Do you have a 1, 2 or 4 digit display?
 
@@ -421,4 +440,3 @@ int monthLength(int tmYear, int month)
       return tm.Day;
   }
 }
-
