@@ -70,7 +70,7 @@
 #include <Bounce2.h>
 
 
-#define BREADBOARD_VERSION
+//#define BREADBOARD_VERSION
 
 
 #define DISP_OFF       0
@@ -100,7 +100,7 @@
 int TwelveHourMode = true;
 
 //Set this variable to change how long the time is shown on the watch face. In milliseconds so 1677 = 1.677 seconds
-int show_time_length = 2000;
+int show_time_length = 4000;
 
 byte state = DISP_OFF;
 
